@@ -1,0 +1,13 @@
+export default function Scissor(props) {
+    return (
+      <svg  viewBox="0 0 412 412" style={{color:'black'}} xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mq450:hidden" ><rect  x="0" y="0" rx="30" fill="transparent" stroke="transparent" stroke-width="0" stroke-opacity="100%" paint-order="stroke"></rect><svg width="196px" height="196px" style={{marginTop:'20px'}} viewBox="0 0 1024 1024" fill="currentColor" x="108" y="108" role="img"  xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><path fill="currentColor" d="m436.004 512l588 512q-56 0-181.5-61.5T587.004 816t-210-156q7 22 7 44q0 54-25 113t-71 101t-96 42q-80 0-136-56t-56-136t56-136t136-56q4 0 21 1q6-32 34-73q-15-31-21-57q-18 1-34 1q-80 0-136-56t-56-135.5t56-136t136-56.5q50 0 96 42t71 101t25 113q0 26-10 50q146-120 358.5-245t291.5-125zm-244-384q-53 0-90.5 37.5t-37.5 90.5t37.5 90.5t90.5 37.5h17q24 0 36-.5t29.5-3.5t25.5-9.5t14-19t6-31.5q0-36-16.5-80.5t-47.5-78t-64-33.5zm0 512q-53 0-90.5 37.5t-37.5 90.5t37.5 90.5t90.5 37.5q33 0 64-33.5t47.5-78t16.5-80.5q0-19-6-31.5t-14-19t-25.5-9.5t-29.5-3.5t-36-.5h-17z"/></g></svg></svg>
+    )
+  }
+
+  
+export function Scissor1(props) {
+    return (
+      <svg width="512" height="512" viewBox="0 0 512 512" style={{}} xmlns="http://www.w3.org/2000/svg" class="h-12 w-12"><rect width="512" height="512" x="0" y="0" rx="0" fill="transparent" stroke="transparent" stroke-width="0" stroke-opacity="100%" paint-order="stroke"></rect><svg width="512px" height="512px" viewBox="0 0 72 72" fill="currentColor" x="0" y="0" role="img"  xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><path fill="#3f3f3f" d="M23.788 41.921s8.357-1.682 8.762-1.796c.957-.27 1.102.541 1.102.541c-.051.505-.76.843-1.288 1.11l-3.952 2.002a6.547 6.547 0 0 1-1.696.58a8.165 8.165 0 0 1-3.198.199c-.967-.378-.81-2.295.27-2.636Z"/><path fill="#9b9b9a" d="M24.284 47.112s8.34-6.635 8.467-7.077s.78-3.555 1.765-4.305c.91-.695 2.216-.529 2.982.937s.09 4.73-.636 5.835s-9.69 6.673-10.386 7.082s-3.361.337-2.192-2.472Z"/><g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M28.438 43.77c-.008 0-.017.008-.026.008a6.327 6.327 0 0 1-1.693.579a8.313 8.313 0 0 1-3.201.202c-.965-.378-.807-2.298.272-2.64c0 0 8.359-1.676 8.762-1.79a1.442 1.442 0 0 1 .167-.035"/><ellipse cx="34.83" cy="25.958" rx="3.748" ry="3.807"/><ellipse cx="45.362" cy="33.794" rx="3.748" ry="3.807"/><path d="m37.367 28.823l-1.964 6.526m6.569-3.175l-4.175 5.613m-13.513 9.325s8.34-6.635 8.467-7.077s.78-3.555 1.765-4.305c.91-.695 2.216-.529 2.982.937s.09 4.73-.636 5.835s-9.69 6.673-10.386 7.082s-3.361.337-2.192-2.472Z"/></g></g></svg></svg>
+    )
+  }
+

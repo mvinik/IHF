@@ -1,0 +1,59 @@
+
+  .contacts h1 {
+    font-size: 30px;
+    font-weight: 400;
+    color: #17191c;
+    padding: 0;
+    margin: 0;
+  }
+  .contacts p {
+    color: #17191c;
+    padding: 0;
+    margin: 0;
+  }
+  .contacts .items {
+    margin: 30px 0;
+  }
+  .contacts .box p {
+    font-size: 17px;
+    margin-top: 10px;
+    padding: 0;
+    margin: 0;
+  }
+  .contacts h4{
+    padding: 0;
+    margin: 0;
+  }
+  .contacts textarea,
+  .contacts input {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    outline: none;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #000;
+    background-color: #eaf9ff;
+  }
+  .contacts h3 {
+    margin-top: 20px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #C5C6C7;
+  }
+  .contacts span {
+    color: #1eb2a6;
+    font-weight: 600;
+    font-size: 15px;
+    word-spacing: 5px;
+  }
+  .contacts .container{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+  }
+  @media screen and (max-width: 768px) {
+ 
+  }
+  
