@@ -52,6 +52,7 @@ if(localStorage.getItem('redirectToCart')){
   const isContentInCart = cart?.course_contents?.some(item => item.id == id);
   console.log(isContentInCart,'isContentInCart')
   useEffect(() => {
+    
   }, [isContentInCart]);
 
   const fetchData = async () => {

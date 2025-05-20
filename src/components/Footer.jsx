@@ -1,23 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './style.component.css'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { LanguageContext } from '../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 const API_URL = process.env.REACT_APP_API_URL;
 
 const Footer = () => {
+
+  const {t} = useTranslation('navbar')
+
+  const {locale} =useContext(LanguageContext)
 
   const navigate = useNavigate();
   const[ footer, setFooter] = useState([]);
   const[social ,setSocial] = useState([]);
 
-  useEffect(()=>{
-    Footer_API();
-  },[]);
-  
+useEffect(() => {
+  Footer_API();
+}, [locale]); // <-- triggers re-fetch when language changes
+
   
     const Footer_API = async() => {
       try{
-        const response = await axios.get(`${API_URL}/api/global?populate[footer][populate]=*`);
+        const response = await axios.get(`${API_URL}/api/global?locale=${locale}&populate[footer][populate]=*`);
         setFooter(response.data.data.attributes.footer[0].links);
         setSocial(response.data.data.attributes.footer[1].links)
       }catch(e){
@@ -47,7 +53,7 @@ const Footer = () => {
         <hr className="my-6 mq925:my-3 w-[90%] border-t-[1px] border-white" />
 
         <div className="flex flex-row px-20 items-center mq925:flex-col  mq925:px-1 justify-between sm:flex-row sm:justify-between">
-            <p className="text-sm  text-white">© Copyright 2024. All Rights Reserved.</p>
+            <p className="text-sm  text-white">{t('© Copyright 2024. All Rights Reserved.')}</p>
 
             <div className="flex -mx-2">
             <div className="icons">

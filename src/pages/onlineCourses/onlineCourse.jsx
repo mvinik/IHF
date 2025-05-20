@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import Footer from '../../components/Footer'
@@ -7,6 +7,7 @@ import Header from '../../components/Header'
 import NavBar from '../../components/NavBar'
 import './onlineCourse.css'
 import { useTranslation } from 'react-i18next'
+import { LanguageContext } from '../../context/LanguageContext'
 
 const API_URL = process.env.REACT_APP_API_URL
 let JWT = localStorage.getItem('JwtToken')
@@ -18,6 +19,8 @@ const OnlineCourse = () => {
     localStorage.removeItem('redirectToCart')
     window.location.reload();
   }
+
+  const { locale } = useContext(LanguageContext)
   const {t}=useTranslation('onlineCourse')
   const queryClient = useQueryClient();
   const [faq, setFaq] = useState([])
@@ -35,12 +38,18 @@ const OnlineCourse = () => {
 
   const Online = async () => {
     const response = await axios.get(
-      `${API_URL}/api/categories?populate[courses][populate]=*`
+      // `http://localhost:1337/api/categories?locale=${locale}&populate[courses][populate]=*`
+     ` ${API_URL}/api/categories?locale=${locale}&populate[courses][populate]=*`
     )
     return response.data.data
   }
 
-  const { data: categories, isLoading, error } = useQuery('Online', Online)
+
+
+  const { data: categories, isLoading, error } = useQuery(['Online', locale], Online, {
+  keepPreviousData: true,
+});
+
 
   const getCartId = async () => {
     const response = await axios.get(
@@ -119,11 +128,14 @@ const OnlineCourse = () => {
   };
 
   const FAQ = async () => {
-    const response = await axios.get(`${API_URL}/api/faqs/1?populate=*`)
+    const response = await axios.get(`http://localhost:1337/api/faqs?locale=${locale}&populate=*`)
     return response.data.data.attributes.Faq
   }
 
-  const { data: faqs } = useQuery('faq', FAQ)
+const { data: faqs } = useQuery(['faq', locale], FAQ, {
+  keepPreviousData: true,
+});
+
 
   if (isLoading) return <div className="loader">Loading..<span></span></div>
   if (error) return <div>An error occurred: {error.message}</div>

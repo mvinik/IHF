@@ -40,7 +40,8 @@ i18n
          details:detailsHI
         }
     },
-    lng: localStorage.getItem('language') || 'en',
+    lng: 'en',
+        // lng: localStorage.getItem('language') || 'en',
     fallbackLng: 'en',
     ns: ['navbar', 'home', 'slider', 'onlineCourse', 'contact','details'],
     defaultNS: 'home',

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useNavigate } from "react-router-dom";
 import 'swiper/css';
@@ -11,21 +11,39 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import SkeletonAvatar from "antd/es/skeleton/Avatar";
 import { useTranslation } from "react-i18next";
+import { LanguageContext } from "../context/LanguageContext";
 const API_URL = process.env.REACT_APP_API_URL;
 
 
 
 const Slider = () => {
+
+  const {locale} = useContext(LanguageContext)
 const navigate = useNavigate();
 const {t}=useTranslation('slider')
 const [imgLoading,setImgLoading] = useState(true);
-    const HomeSlider = async() => {
-        const response = await axios.get(`${API_URL}/api/sliders?populate=*`);
-        return response.data.data;
-      }
-      const {data:slider,isLoading,error} = useQuery('Slider',HomeSlider);
-      // if (isLoading) return <SkeletonAvatar active shape="square" size={30}/>
-      if (error) return <div>An error occurred: {error.message}</div>;
+
+const fetchSliders = async ()=>{
+  const {data}=await axios.get(
+    `${API_URL}/api/sliders?locale=${locale}&populate=*`
+  );
+  return data.data;
+}
+
+const {data:slider=[],isLoading,error}=useQuery(
+  ["sliders",locale],
+  fetchSliders,{
+    keepPreviousData:true,
+  }
+)
+    
+// const HomeSlider = async() => {
+//         const response = await axios.get(`${API_URL}/api/sliders?populate=*`);
+//         return response.data.data;
+//       }
+//       const {data:slider,isLoading,error} = useQuery('Slider',HomeSlider);
+//       // if (isLoading) return <SkeletonAvatar active shape="square" size={30}/>
+//       if (error) return <div>An error occurred: {error.message}</div>;
 
 
   return (

@@ -1,10 +1,11 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Footer from '../../components/Footer'
 import NavBar from '../../components/NavBar'
 import { useTranslation } from 'react-i18next';
+import { LanguageContext } from '../../context/LanguageContext';
 const API_URL = process.env.REACT_APP_API_URL;
 let JWT  = localStorage.getItem("JwtToken"); ;
 const userId = localStorage.getItem("UserId");
@@ -17,6 +18,8 @@ const ListOfvideo = () => {
     localStorage.removeItem('redirectToCart')
     window.location.reload();
   }
+
+  const {locale} = useContext(LanguageContext)
  const {t}=useTranslation('onlineCourse')
   const queryClient = useQueryClient();
     const { id } = useParams();
@@ -25,7 +28,7 @@ const ListOfvideo = () => {
     const fetchData = async () => {
         try {
           const response = await axios.get(
-            `${API_URL}/api/courses/${id}?populate=*`
+            `${API_URL}/api/courses/${id}?locale=${locale}populate=*`
           );
           setCourseData(response.data.data);
           return response.data.data;
@@ -36,7 +39,7 @@ const ListOfvideo = () => {
 
       useEffect(() => {
         fetchData();
-      },[id])
+      },[id,locale])
 
 // console.log(CourseData);
 
