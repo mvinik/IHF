@@ -120,8 +120,10 @@ const Checkout = () => {
     e.preventDefault();
 
     const options = {
-      key: "rzp_test_RJ6nR06W2Bz9gm",
-      key_secret: "RxH5iAhnwIUuvvWwJhRGKKU5",
+      key: "rzp_test_2mKCQlbStCUGWu",
+      key_secret: "Lc4VMl4m9JJVsuvZqTsap10m",
+      //   key: "rzp_test_RJ6nR06W2Bz9gm",
+      // key_secret: "RxH5iAhnwIUuvvWwJhRGKKU5",
       amount: price * 100,
       currency: "INR",
       name: "IHF by Javed Khan",

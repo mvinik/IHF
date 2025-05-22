@@ -2,7 +2,7 @@ import { Layout } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { useState } from 'react'
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
@@ -11,11 +11,14 @@ import DivetPbBlurbContent from './DivetPbBlurbContent'
 import './homePage.css'
 import Slider from '../../components/Slider'
 import { useTranslation } from 'react-i18next';
+import { LanguageContext } from '../../context/LanguageContext'
 const API_URL = process.env.REACT_APP_API_URL;
 
 
 
 const HomePage = () => {
+
+  const {locale}=useContext(LanguageContext)
   const navigate = useNavigate();
   const [cards , setCards] = useState([]);
   const [about , setAbout] = useState([]);
@@ -44,7 +47,7 @@ const Home = async() => {
       console.error(e);
     }
     try{
-      const response = await axios.get(`${API_URL}/api/pages/1?populate[cards][populate]=*`);
+      const response = await axios.get(`${API_URL}/api/pages/1?locale=${locale}&populate[cards][populate]=*`);
       setCards(response.data.data.attributes.cards);
       // console.log(response.data,'Home');
     }catch(e){
@@ -52,7 +55,7 @@ const Home = async() => {
     }
 
     try{
-      const response = await axios.get(`${API_URL}/api/pages/1?populate[blocks][populate]=*`);
+      const response = await axios.get(`${API_URL}/api/pages/1?locale=${locale}&populate[blocks][populate]=*`);
       setLoading(false);
       setAbout(response.data.data.attributes.blocks[2]);
       setAbtCard(response.data.data.attributes.blocks);

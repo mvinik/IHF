@@ -101,7 +101,7 @@ const { data: navLinks, isLoading, error } = useQuery(['Nav', locale], fetchGlob
         </ul>
      
       ))}
-          <LanguageToggle/>
+        
            
     </div>
 
@@ -121,6 +121,9 @@ const { data: navLinks, isLoading, error } = useQuery(['Nav', locale], fetchGlob
 
 
     <div className="mq925:hidden flex items-center justify-center gap-7">
+      <div>
+          <LanguageToggle/>
+      </div>
 
     <div className='hover:cursor-pointer' onClick={()=>navigate('/checkout')}>
     <SlHandbag className='text-yellow text-3xl' />
@@ -138,8 +141,10 @@ const { data: navLinks, isLoading, error } = useQuery(['Nav', locale], fetchGlob
 
     </div>
 
-    <div className="flex gap-5 items-center justify-end mq1825:hidden mq1250:hidden mq1826:hidden mq925:flex ">
-
+    <div className="flex gap-3 px-2 items-center justify-end mq1825:hidden mq1250:hidden mq1826:hidden mq925:flex ">
+<div>
+          <LanguageToggle/>
+      </div> 
     <div className='hover:cursor-pointer' onClick={()=>navigate('/checkout')}>
     <SlHandbag className='text-yellow text-5xl' />
         </div>
@@ -222,6 +227,8 @@ const { data: navLinks, isLoading, error } = useQuery(['Nav', locale], fetchGlob
     </Drawer>
     </ConfigProvider> */}
   </nav>
+  
+   
   <div className="mq925:flex flex-wrap  mq1250:hidden mq1825:hidden mq1826:hidden  bg-blue">
       {navLinks && navLinks.map((nav) => (
         <ul key={nav.id} className=" my-1  list-none text-yellow ">
@@ -232,7 +239,7 @@ const { data: navLinks, isLoading, error } = useQuery(['Nav', locale], fetchGlob
           </li>
         </ul>
       ))}
-           <LanguageToggle/>
+         
     </div> 
 
     {/* <div className="mq925:flex flex-wrap  mq1250:hidden mq1825:hidden mq1826:hidden  bg-blue">

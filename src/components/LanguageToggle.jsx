@@ -1,4 +1,4 @@
-
+import { useState,useEffect } from "react";
 import { useContext } from "react";
 import { LanguageContext } from "../context/LanguageContext";
 import InputLabel from '@mui/material/InputLabel';
@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import './style.component.css';
 
 // import React from 'react';
 // import { useTranslation } from 'react-i18next';
@@ -88,27 +89,64 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 // }
 
 
+// export default function LanguageToggle() {
+//   const { locale, changeLanguage } = useContext(LanguageContext);
+
+//   return (
+//     <FormControl sx={{ m: 1, minWidth: 60 }}>
+//       <Select
+//         value={locale}
+//         onChange={(e) => changeLanguage(e.target.value)}
+//         displayEmpty
+//         inputProps={{ 'aria-label': 'Without label' }}
+//         sx={{
+//           color: 'white',
+//           '& .MuiSvgIcon-root': { color: 'white' }, // dropdown arrow
+//           '& .MuiOutlinedInput-notchedOutline': {
+//             borderColor: 'white',
+//           },
+//         }}
+//       >
+//         <MenuItem value="en" sx={{ color: 'black' }}>English</MenuItem>
+//         <MenuItem value="hi" sx={{ color: 'black' }}>Hindi</MenuItem>
+//       </Select>
+//     </FormControl>
+//   );
+// }
+
 export default function LanguageToggle() {
-  const { locale, changeLanguage } = useContext(LanguageContext);
+  const { locale, changeLanguage } = useContext(LanguageContext)
+  // state to track “is mobile” (<640px)
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' && window.innerWidth < 640
+  );
+
+  useEffect(() => {
+    const onResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // inline style object
+  const selectStyle = {
+    padding: isMobile ? '7px 10px' : '8px 10px',
+    fontSize: isMobile ? '7px' : '12px',
+    maxWidth: isMobile ? '60px' : '100px',
+    backgroundColor: '#fbbf24', // tailwind-yellow-400
+    borderRadius: '0.75rem',
+    cursor: 'pointer',
+  };
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 60 }}>
-      <Select
-        value={locale}
-        onChange={(e) => changeLanguage(e.target.value)}
-        displayEmpty
-        inputProps={{ 'aria-label': 'Without label' }}
-        sx={{
-          color: 'white',
-          '& .MuiSvgIcon-root': { color: 'white' }, // dropdown arrow
-          '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: 'white',
-          },
-        }}
-      >
-        <MenuItem value="en" sx={{ color: 'black' }}>English</MenuItem>
-        <MenuItem value="hi" sx={{ color: 'black' }}>Hindi</MenuItem>
-      </Select>
-    </FormControl>
-  );
+    <select
+      value={locale}
+      onChange={e => changeLanguage(e.target.value)}
+      style={selectStyle}
+    >
+      <option value="en">ENGLISH</option>
+      <option value="hi">हिन्दी</option>
+    </select>
+  )
 }

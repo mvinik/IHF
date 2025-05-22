@@ -44,8 +44,6 @@ const OnlineCourse = () => {
     return response.data.data
   }
 
-
-
   const { data: categories, isLoading, error } = useQuery(['Online', locale], Online, {
   keepPreviousData: true,
 });
@@ -128,8 +126,8 @@ const OnlineCourse = () => {
   };
 
   const FAQ = async () => {
-    const response = await axios.get(`http://localhost:1337/api/faqs?locale=${locale}&populate=*`)
-    return response.data.data.attributes.Faq
+    const response = await axios.get(`${API_URL}/api/faqs?locale=${locale}&populate=*`)
+    return response.data.data[0]?.attributes.Faq
   }
 
 const { data: faqs } = useQuery(['faq', locale], FAQ, {

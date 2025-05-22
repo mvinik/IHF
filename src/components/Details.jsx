@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
-import React, { useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import Footer from "./Footer";
@@ -8,11 +8,14 @@ import NavBar from "./NavBar";
 import { notification } from "antd";
 import Scissor, { Scissor1 } from "./Icons";
 import { useTranslation } from "react-i18next";
+import { LanguageContext } from "../context/LanguageContext";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const JWT = localStorage.getItem("JwtToken");
 // Details changed 
 const Details = () => {
+
+  const {locale} =useContext(LanguageContext)
   const { t }=useTranslation('details')
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -41,12 +44,12 @@ if(localStorage.getItem('redirectToCart')){
 
   const User = async () => {
     const response = await axios.get(
-      `${API_URL}/api/users/${userId}?populate[cart][populate]=*`
+      `${API_URL}/api/users/${userId}?locale=${locale}&populate[cart][populate]=*`
     );
     return response.data.cart;
   };
 
-  const { data: cart } = useQuery("Cart", User);
+  const { data: cart } = useQuery(["Cart",locale], User);
 
   console.log(cart, "cart details");
   const isContentInCart = cart?.course_contents?.some(item => item.id == id);
@@ -58,7 +61,7 @@ if(localStorage.getItem('redirectToCart')){
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${API_URL}/api/course-contents/${id}?populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
+        `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
       );
       const responseData = response.data.data;
       setCourse(responseData.attributes);
@@ -208,6 +211,21 @@ if(localStorage.getItem('redirectToCart')){
       setIsPlaying(true);
     }
 
+  
+  // if (isBought) {
+  //   setLessonVideoUrl(lessonPlan[0].courseVideo.data.attributes.url);
+  //   setIsPlaying(true);
+  // } else {
+  //   notification.error({
+  //     message: "You should pay to watch this course.",
+  //     placement: "top",
+  //   });
+  //   // Don't play anything
+  //   setIsPlaying(false);
+  // }
+
+
+
   };
 
 
@@ -321,7 +339,7 @@ if(localStorage.getItem('redirectToCart')){
                 {t("Add to Cart")}
                 </button>
               )}
-            </div>
+            </div>       
           )}
 
           {/* Course Info */}
