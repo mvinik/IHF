@@ -1,260 +1,481 @@
+// import { useQuery, useQueryClient } from "react-query";
+// import axios from "axios";
+// import React, { useContext, useEffect, useRef } from "react";
+// import { useState } from "react";
+// import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+// import Footer from "./Footer";
+// import NavBar from "./NavBar";
+// import { notification } from "antd";
+// import Scissor, { Scissor1 } from "./Icons";
+// import { useTranslation } from "react-i18next";
+// import { LanguageContext } from "../context/LanguageContext";
+
+
+// const API_URL = process.env.REACT_APP_API_URL;
+// const JWT = localStorage.getItem("JwtToken");
+// // Details changed 
+// const Details = () => {
+
+//   const {locale} =useContext(LanguageContext)
+//   const { t }=useTranslation('details')
+//   const { id } = useParams();
+//   const queryClient = useQueryClient();
+//   const navigate = useNavigate();
+//   const [course, setCourse] = useState([]);
+//   const [Desc, setDesc] = useState([]);
+//   const [image, setImage] = useState(null);
+//   const [video, setVideo] = useState(null);
+//   const [previewVideo, setPreviewVideo] = useState(null);
+//   const [learn, setLearn] = useState([]);
+//   const [updatedAt, setUpdatedAt] = useState("");
+//   const [courseInCart, setCourseInCart] = useState(false);
+//   const [isBought, setIsBought] = useState(false);
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [purchasedId, setPurchasedId] = useState(null);
+//   const [lessonVideoUrl, setLessonVideoUrl] = useState(null);
+//   const [videoKey, setVideoKey] = useState(0);
+//   const userId = localStorage.getItem("UserId");
+
+
+  
+// if(localStorage.getItem('redirectToCart')){
+//   localStorage.removeItem('redirectToCart')
+//   window.location.reload();
+// }
+
+//   const User = async () => {
+//     const response = await axios.get(
+//       `${API_URL}/api/users/${userId}?locale=${locale}&populate[cart][populate]=*`
+//     );
+//     return response.data.cart;
+//   };
+
+//   const { data: cart } = useQuery(["Cart",locale], User);
+
+//   console.log(cart, "cart details");
+//   const isContentInCart = cart?.course_contents?.some(item => item.id == id);
+//   console.log(isContentInCart,'isContentInCart')
+//   useEffect(() => {
+    
+//   }, [isContentInCart]);
+
+//   const fetchData = async () => {
+//     try {
+//       const response = await axios.get(
+//         `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
+//       );
+//       const responseData = response.data.data;
+//       setCourse(responseData.attributes);
+//       console.log("course details ",response.data);
+//       setLearn(response.data.data.attributes.content.WhatYouWillLearn);
+//       setDesc(response.data.data.attributes.content.Description);
+//       setImage(response.data.data.attributes.content.Cover.data.attributes.url);
+//       setVideo(response.data.data.attributes.content.courseVideo.data.attributes.url);
+//       setPreviewVideo(response.data.data.attributes.PreviewVideo.data.attributes.url)
+//       setUpdatedAt(response.data.data.attributes.updatedAt);
+//       localStorage.removeItem("redirectToCart");
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+  
+//   const addToCart = async () => {
+//     if (JWT) {
+//       if(cart){
+//         try {
+//           const response = await axios.put(`${API_URL}/api/carts/${cart.id}`, {
+//             data: {
+//               course_contents: {
+//                 connect: [id],
+//               },
+//             },
+//           });
+//           console.log(response,'addtocart')
+
+//           // console.log(response, "cartUpdated");
+//           queryClient.invalidateQueries("Cart");
+//         } catch (err) {
+//           console.error(err);
+//         }
+//       }else{
+//         try {
+//           const response = await axios.post(`${API_URL}/api/carts`, {
+//             data: {
+//               course_contents: {
+//                 connect: [id],
+//               },
+//               user: userId,
+//             },
+//           });
+//           queryClient.invalidateQueries("Cart");
+//           // console.log(response, "cartCreated");
+//         } catch (err) {
+//           console.error(err);
+//         }
+//       }
+//     } else {
+//       localStorage.setItem("redirectToCart", window.location.pathname);
+//       navigate("/login");
+//     }
+//   };
+
+//   const isCartEmpty = async () => {
+//     // console.log("id:", id);
+//     // console.log("cartCourses:", cart);
+//     if (cart && cart.courses && cart.courses.length > 0) {
+//       const isLiked = cart.courses.map(
+//         (course) => course.id.toString() === id.toString()
+//       );
+      
+//       const anyLiked = isLiked.includes(true);
+
+//       if (anyLiked) {
+//         queryClient.invalidateQueries("Cart");
+//         setCourseInCart(true);
+//         // console.log("courseincart", courseInCart);
+//       }
+//     } else {
+//       console.log("Cart is empty");
+//     }
+//   };
+
+//   const PurchasedCourse = async () => {
+//     const response = await axios.get(
+//       `${API_URL}/api/users/${userId}?populate[purchased_course][populate]=*`
+//     );
+//     if(response.data.purchased_course){
+//       return response.data.purchased_course.courses;
+//     }
+//   };
+//   const { data: purchasedCourse,isLoading,error } = useQuery(
+//     "PurchasedCourse",
+//     PurchasedCourse
+//   );
+//   // console.log(purchasedCourse, "PurchasedCourse");
+
+//   const LessonPlan = async() =>{
+//     const response = await axios.get(`${API_URL}/api/courses/${id}?populate[LessonPlan][populate]=*`);
+//     return response.data.data.attributes.LessonPlan;
+//   }
+//   const { data: lessonPlan } = useQuery(
+//     "LessonPlan",
+//     LessonPlan
+//   );
+//   // console.log(lessonPlan, "LessonPlan");
+
+//   const isPurchased = () => {
+//     if (
+//       purchasedCourse &&
+//       purchasedCourse.length > 0
+//       ) {
+//         const isPurchase = purchasedCourse.map(course => course.id.toString() === id.toString());
+//         // console.log(isPurchase, "purchasedCourse is true or not");
+//         // console.log(id,'course ID');
+//         const anyLiked = isPurchase.includes(true);
+//         if (anyLiked) {
+//         // queryClient.invalidateQueries("PurchasedCourse");
+//         setIsBought(true);
+//         // console.log(isBought, "isBoughtCourse is true or not");
+//       }
+//     } else {
+//       console.log("NO courses purchased");
+//     }
+//   };
+  
+//   useEffect(() => {
+//     isPurchased();
+//   }, [purchasedCourse]);
+
+ 
+//   const [isPreview,setIsPreview] = useState(true);
+//   const handlePlay = (videoUrl) => {
+//     window.scrollTo({
+//       top: 0,
+//       behavior: "smooth"
+//     });
+//       if (isBought) {
+//         setIsPreview(false);
+//         setLessonVideoUrl(videoUrl);
+//         setIsPlaying(true);
+//         setVideoKey(prevKey => prevKey + 1);
+//       } else {
+//         notification.error({message:"Please make a payment to unlock the video.",placement:"top"});
+//       }
+//   };
+//   const handlePreviewPlay =() => {
+
+//     if(isBought) {
+//       setLessonVideoUrl(lessonPlan[0].courseVideo.data.attributes.url);
+//       setIsPlaying(true);
+//     }else{
+//       setLessonVideoUrl(video);
+//       setIsPlaying(true);
+//     }
+
+  
+//   // if (isBought) {
+//   //   setLessonVideoUrl(lessonPlan[0].courseVideo.data.attributes.url);
+//   //   setIsPlaying(true);
+//   // } else {
+//   //   notification.error({
+//   //     message: "You should pay to watch this course.",
+//   //     placement: "top",
+//   //   });
+//   //   // Don't play anything
+//   //   setIsPlaying(false);
+//   // }
+
+
+
+//   };
+
+
+//   useEffect(() => {
+//     fetchData();
+//   }, [id]);
+
+//   useEffect(() => {
+//     isCartEmpty();
+//   }, [cart]);
+
+ 
+//   if (isLoading)
+//     return (
+//       <div class="loader">
+//         Fetching..<span></span>
+//       </div>
+//     );
+//   if (error) return <section class="flex items-center h-screen p-16 ">
+//   <div class="container flex flex-col items-center ">
+//       <div class="flex flex-col gap-2 max-w-md text-center">
+//           <h1 class="font-extrabold text-[5rem] my-0 p-0 text-white">
+//             404
+//           </h1>
+//           <p class="text-2xl my-0 text-white">{t("Sorry, we couldn't find this page.")}</p>
+//           <a href="/" class="btn">{t("Back to home")}</a>
+//       </div>
+//   </div>
+// </section>;
+
+
+
 import { useQuery, useQueryClient } from "react-query";
 import axios from "axios";
-import React, { useContext, useEffect, useRef } from "react";
-import { useState } from "react";
-import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import { notification } from "antd";
-import Scissor, { Scissor1 } from "./Icons";
+import Scissor1 from "./Icons"; // Assuming this is your custom icon
 import { useTranslation } from "react-i18next";
 import { LanguageContext } from "../context/LanguageContext";
 
 const API_URL = process.env.REACT_APP_API_URL;
 const JWT = localStorage.getItem("JwtToken");
-// Details changed 
-const Details = () => {
 
-  const {locale} =useContext(LanguageContext)
-  const { t }=useTranslation('details')
+const Details = () => {
+  const {locale}=useContext(LanguageContext)
+  const { t } = useTranslation("details");
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const userId = localStorage.getItem("UserId");
+
+  // STATES
   const [course, setCourse] = useState([]);
   const [Desc, setDesc] = useState([]);
   const [image, setImage] = useState(null);
   const [video, setVideo] = useState(null);
   const [previewVideo, setPreviewVideo] = useState(null);
   const [learn, setLearn] = useState([]);
-  const [updatedAt, setUpdatedAt] = useState("");
   const [courseInCart, setCourseInCart] = useState(false);
   const [isBought, setIsBought] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [purchasedId, setPurchasedId] = useState(null);
   const [lessonVideoUrl, setLessonVideoUrl] = useState(null);
   const [videoKey, setVideoKey] = useState(0);
-  const userId = localStorage.getItem("UserId");
+  const [updatedAt, setUpdatedAt] = useState("");
 
 
-  
-if(localStorage.getItem('redirectToCart')){
-  localStorage.removeItem('redirectToCart')
-  window.location.reload();
-}
+  // CART
+  const { data: cart } = useQuery("Cart", async () => {
+    const res = await axios.get(`${API_URL}/api/users/${userId}?populate[cart][populate]=*`);
+    return res.data.cart;
+  });
 
-  const User = async () => {
-    const response = await axios.get(
-      `${API_URL}/api/users/${userId}?locale=${locale}&populate[cart][populate]=*`
-    );
-    return response.data.cart;
-  };
-
-  const { data: cart } = useQuery(["Cart",locale], User);
-
-  console.log(cart, "cart details");
   const isContentInCart = cart?.course_contents?.some(item => item.id == id);
-  console.log(isContentInCart,'isContentInCart')
-  useEffect(() => {
-    
-  }, [isContentInCart]);
 
-  const fetchData = async () => {
+  // FETCH COURSE DETAILS
+  useEffect(() => {
+    // const fetchData = async () => {
+    //   const res = await axios.get(
+    //     `${API_URL}/api/course-contents/${id}?populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
+    //   );
+    //   const data = res.data.data;
+    //   setCourse(data.attributes);
+    //   setDesc(data.attributes.content.Description);
+    //   setLearn(data.attributes.content.WhatYouWillLearn);
+    //   setImage(data.attributes.content.Cover.data.attributes.url);
+    //   setVideo(data.attributes.content.courseVideo.data.attributes.url);
+    //   setPreviewVideo(data.attributes.PreviewVideo.data.attributes.url);
+    // };
+
+    const fetchData = async () => {
+  try {
+    const response = await axios.get(
+      //previous url
+
+      // `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
+    
+      //new url for different id's ,solution is localizations
+
+        `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo&populate=localizations`
+    
+    );
+    const responseData = response.data.data;
+    setCourse(responseData.attributes);
+    setLearn(responseData.attributes.content.WhatYouWillLearn || []);
+    setDesc(responseData.attributes.content.Description || []);
+
+    // Safe image access
+    const cover = responseData.attributes.content?.Cover?.data?.attributes?.url;
+    if (cover) setImage(cover);
+
+    // Safe video access
+    const courseVideo = responseData.attributes.content?.courseVideo?.data?.attributes?.url;
+    if (courseVideo) setVideo(courseVideo);
+
+    // Safe preview video access
+    const previewVideo = responseData.attributes?.PreviewVideo?.data?.attributes?.url;
+    if (previewVideo) setPreviewVideo(previewVideo);
+
+    setUpdatedAt(responseData.attributes.updatedAt);
+    localStorage.removeItem("redirectToCart");
+  } catch (err) {
+    console.error("Failed to fetch course content:", err);
+  }
+};
+
+
+    fetchData();
+  }, [id]);
+
+  // HANDLE CART ADD
+  const addToCart = async () => {
+    if (!JWT) {
+      localStorage.setItem("redirectToCart", window.location.pathname);
+      navigate("/login");
+      return;
+    }
+
     try {
-      const response = await axios.get(
-        `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
-      );
-      const responseData = response.data.data;
-      setCourse(responseData.attributes);
-      console.log("course details ",response.data);
-      setLearn(response.data.data.attributes.content.WhatYouWillLearn);
-      setDesc(response.data.data.attributes.content.Description);
-      setImage(response.data.data.attributes.content.Cover.data.attributes.url);
-      setVideo(response.data.data.attributes.content.courseVideo.data.attributes.url);
-      setPreviewVideo(response.data.data.attributes.PreviewVideo.data.attributes.url)
-      setUpdatedAt(response.data.data.attributes.updatedAt);
-      localStorage.removeItem("redirectToCart");
+      if (cart) {
+        await axios.put(`${API_URL}/api/carts/${cart.id}`, {
+          data: { course_contents: { connect: [id] } },
+        });
+      } else {
+        await axios.post(`${API_URL}/api/carts`, {
+          data: { course_contents: { connect: [id] }, user: userId },
+        });
+      }
+      queryClient.invalidateQueries("Cart");
     } catch (err) {
       console.error(err);
     }
   };
+
+  // CHECK IF PURCHASED
+  // const { data: purchasedCourse } = useQuery("PurchasedCourse", async () => {
+  //   const res = await axios.get(
+  //     `${API_URL}/api/users/${userId}?populate[purchased_course][populate][0]=courses.course_contents&populate[purchased_course][populate][1]=course_contents&populate[purchased_course][populate][2]=combo_packages.courses.course_contents`
+  //   );
+  //   return res.data.purchased_course;
+  // });
   
-  const addToCart = async () => {
-    if (JWT) {
-      if(cart){
-        try {
-          const response = await axios.put(`${API_URL}/api/carts/${cart.id}`, {
-            data: {
-              course_contents: {
-                connect: [id],
-              },
-            },
-          });
-          console.log(response,'addtocart')
-
-          // console.log(response, "cartUpdated");
-          queryClient.invalidateQueries("Cart");
-        } catch (err) {
-          console.error(err);
-        }
-      }else{
-        try {
-          const response = await axios.post(`${API_URL}/api/carts`, {
-            data: {
-              course_contents: {
-                connect: [id],
-              },
-              user: userId,
-            },
-          });
-          queryClient.invalidateQueries("Cart");
-          // console.log(response, "cartCreated");
-        } catch (err) {
-          console.error(err);
-        }
-      }
-    } else {
-      localStorage.setItem("redirectToCart", window.location.pathname);
-      navigate("/login");
-    }
-  };
-
-  const isCartEmpty = async () => {
-    // console.log("id:", id);
-    // console.log("cartCourses:", cart);
-    if (cart && cart.courses && cart.courses.length > 0) {
-      const isLiked = cart.courses.map(
-        (course) => course.id.toString() === id.toString()
-      );
-      
-      const anyLiked = isLiked.includes(true);
-
-      if (anyLiked) {
-        queryClient.invalidateQueries("Cart");
-        setCourseInCart(true);
-        // console.log("courseincart", courseInCart);
-      }
-    } else {
-      console.log("Cart is empty");
-    }
-  };
-
-  const PurchasedCourse = async () => {
-    const response = await axios.get(
-      `${API_URL}/api/users/${userId}?populate[purchased_course][populate]=*`
-    );
-    if(response.data.purchased_course){
-      return response.data.purchased_course.courses;
-    }
-  };
-  const { data: purchasedCourse,isLoading,error } = useQuery(
-    "PurchasedCourse",
-    PurchasedCourse
+  const { data: purchasedCourse } = useQuery("PurchasedCourse", async () => {
+  const res = await axios.get(
+    `${API_URL}/api/users/${userId}?populate[purchased_course][populate][0]=courses.course_contents&populate[purchased_course][populate][1]=course_contents&populate[purchased_course][populate][2]=combo_packages.courses.course_contents`
   );
-  // console.log(purchasedCourse, "PurchasedCourse");
+  return res.data.purchased_course;
+});
 
-  const LessonPlan = async() =>{
-    const response = await axios.get(`${API_URL}/api/courses/${id}?populate[LessonPlan][populate]=*`);
-    return response.data.data.attributes.LessonPlan;
-  }
-  const { data: lessonPlan } = useQuery(
-    "LessonPlan",
-    LessonPlan
-  );
-  // console.log(lessonPlan, "LessonPlan");
 
-  const isPurchased = () => {
+const isPurchased = () => {
+  if (purchasedCourse) {
+    // 1. Direct course content purchase
     if (
-      purchasedCourse &&
-      purchasedCourse.length > 0
-      ) {
-        const isPurchase = purchasedCourse.map(course => course.id.toString() === id.toString());
-        // console.log(isPurchase, "purchasedCourse is true or not");
-        // console.log(id,'course ID');
-        const anyLiked = isPurchase.includes(true);
-        if (anyLiked) {
-        // queryClient.invalidateQueries("PurchasedCourse");
-        setIsBought(true);
-        // console.log(isBought, "isBoughtCourse is true or not");
-      }
-    } else {
-      console.log("NO courses purchased");
+      purchasedCourse.course_contents &&
+      purchasedCourse.course_contents.some(content => content.id.toString() === id.toString())
+    ) {
+      setIsBought(true);
+      return;
     }
-  };
-  
+
+    // 2. Course purchase
+    if (
+      purchasedCourse.courses &&
+      purchasedCourse.courses.some(course =>
+        course.course_contents?.some(content => content.id.toString() === id.toString())
+      )
+    ) {
+      setIsBought(true);
+      return;
+    }
+
+    // 3. Combo package course content access
+
+    if (
+  purchasedCourse.combo_packages &&
+  purchasedCourse.combo_packages.some(pkg =>
+    pkg.courses?.some(course =>
+      course?.course_contents?.some(content =>
+        content.id.toString() === id.toString()
+      )
+    )
+  )
+) {
+  setIsBought(true);
+  return;
+}
+
+    // if (
+    //   purchasedCourse.combo_packages &&
+    //   purchasedCourse.combo_packages.some(pkg =>
+    //     pkg.courses?.some(course =>
+    //       course.course_contents?.some(content => content.id.toString() === id.toString())
+    //     )
+    //   )
+    // ) {
+    //   setIsBought(true);
+    //   return;
+    // }
+  }
+};
+
   useEffect(() => {
     isPurchased();
   }, [purchasedCourse]);
 
- 
-  const [isPreview,setIsPreview] = useState(true);
-  const handlePlay = (videoUrl) => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-      if (isBought) {
-        setIsPreview(false);
-        setLessonVideoUrl(videoUrl);
-        setIsPlaying(true);
-        setVideoKey(prevKey => prevKey + 1);
-      } else {
-        notification.error({message:"Please make a payment to unlock the video.",placement:"top"});
-      }
-  };
-  const handlePreviewPlay =() => {
-
-    if(isBought) {
-      setLessonVideoUrl(lessonPlan[0].courseVideo.data.attributes.url);
-      setIsPlaying(true);
-    }else{
+  // VIDEO HANDLING
+  const handlePreviewPlay = () => {
+    if (isBought) {
       setLessonVideoUrl(video);
-      setIsPlaying(true);
+    } else {
+      setLessonVideoUrl(previewVideo || video);
     }
-
-  
-  // if (isBought) {
-  //   setLessonVideoUrl(lessonPlan[0].courseVideo.data.attributes.url);
-  //   setIsPlaying(true);
-  // } else {
-  //   notification.error({
-  //     message: "You should pay to watch this course.",
-  //     placement: "top",
-  //   });
-  //   // Don't play anything
-  //   setIsPlaying(false);
-  // }
-
-
-
+    setIsPlaying(true);
+    setVideoKey(prev => prev + 1);
   };
 
+  const handlePlay = () => {
+    if (!isBought) {
+      notification.error({ message: "Please make a payment to unlock the video." });
+      return;
+    }
+    setLessonVideoUrl(video);
+    setIsPlaying(true);
+    setVideoKey(prev => prev + 1);
+  };
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
-
-  useEffect(() => {
-    isCartEmpty();
-  }, [cart]);
-
- 
-  if (isLoading)
-    return (
-      <div class="loader">
-        Fetching..<span></span>
-      </div>
-    );
-  if (error) return <section class="flex items-center h-screen p-16 ">
-  <div class="container flex flex-col items-center ">
-      <div class="flex flex-col gap-2 max-w-md text-center">
-          <h1 class="font-extrabold text-[5rem] my-0 p-0 text-white">
-            404
-          </h1>
-          <p class="text-2xl my-0 text-white">{t("Sorry, we couldn't find this page.")}</p>
-          <a href="/" class="btn">{t("Back to home")}</a>
-      </div>
-  </div>
-</section>;
 
   return (
     <>

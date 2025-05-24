@@ -1,25 +1,27 @@
-import React, { createContext, useState } from "react";
-import { useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import i18n from '../i18n';
 
-import i18n from '../i18n'
+export const LanguageContext = createContext();
 
-export const LanguageContext=createContext()
-export function LanguageProvider({children}){
-    const [locale,setLocale]=useState(i18n.language || 'en')
-        // const [locale,setLocale]=useState('en')
-  // Sync with i18n on mount
+export function LanguageProvider({ children }) {
+  // Initialize locale from localStorage or fallback to i18n.language or 'en'
+  const [locale, setLocale] = useState(
+    localStorage.getItem('language') || i18n.language || 'en'
+  );
+
+  // Sync i18n with locale and store it in localStorage
   useEffect(() => {
     i18n.changeLanguage(locale);
+    localStorage.setItem('language', locale);
   }, [locale]);
 
-    const changeLanguage=(lng)=>{
-        i18n.changeLanguage(lng)
-        setLocale(lng)
-    }
+  const changeLanguage = (lng) => {
+    setLocale(lng); // This will trigger useEffect
+  };
 
-    return (
-        <LanguageContext.Provider value={{locale,changeLanguage}}>
-            {children}
-        </LanguageContext.Provider>
-    )
+  return (
+    <LanguageContext.Provider value={{ locale, changeLanguage }}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }

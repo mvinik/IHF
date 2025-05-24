@@ -14,6 +14,8 @@ import contactEN from './locales/en/contact.json';
 import contactHI from './locales/hi/contact.json';
 import detailsEN from './locales/en/details.json';
 import detailsHI from './locales/hi/details.json';
+import checkoutEN from './locales/en/checkout.json';
+import checkoutHI from './locales/hi/checkout.json';
 
 
 
@@ -28,7 +30,8 @@ i18n
         slider:sliderEN,
         onlineCourse: onlineCourseEN ,
         contact:contactEN,
-        details:detailsEN
+        details:detailsEN,
+        checkout:checkoutEN,
 
     },
       hi: {
@@ -37,13 +40,14 @@ i18n
          slider:sliderHI,
          onlineCourse: onlineCourseHI,
          contact:contactHI,
-         details:detailsHI
+         details:detailsHI,
+         checkout:checkoutHI,
         }
     },
     lng: 'en',
         // lng: localStorage.getItem('language') || 'en',
     fallbackLng: 'en',
-    ns: ['navbar', 'home', 'slider', 'onlineCourse', 'contact','details'],
+    ns: ['navbar', 'home', 'slider', 'onlineCourse', 'contact','details','checkout'],
     defaultNS: 'home',
     interpolation: { escapeValue: false }
   });

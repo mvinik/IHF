@@ -12,6 +12,7 @@ import './homePage.css'
 import Slider from '../../components/Slider'
 import { useTranslation } from 'react-i18next';
 import { LanguageContext } from '../../context/LanguageContext'
+import { useRef } from 'react';
 const API_URL = process.env.REACT_APP_API_URL;
 
 
@@ -47,37 +48,80 @@ const Home = async() => {
       console.error(e);
     }
     try{
-      const response = await axios.get(`${API_URL}/api/pages/1?locale=${locale}&populate[cards][populate]=*`);
-      setCards(response.data.data.attributes.cards);
-      // console.log(response.data,'Home');
+      const response = await axios.get(`${API_URL}/api/pages?filters[Title][$eq]=homepage&locale=${locale}&populate[cards][populate]=*`);
+      setCards(response.data.data[0].attributes.cards);
+   //console.log(response.data,'Home');
     }catch(e){
       console.error(e);
     }
 
-    try{
-      const response = await axios.get(`${API_URL}/api/pages/1?locale=${locale}&populate[blocks][populate]=*`);
-      setLoading(false);
-      setAbout(response.data.data.attributes.blocks[2]);
-      setAbtCard(response.data.data.attributes.blocks);
-      setAbtImage(response.data.data.attributes.blocks[2].Image.data.attributes.url);
-      // setAbtCard(abtCard.slice(-3));
-      setAbtDesc(response.data.data.attributes.blocks[2].Description[0].children);
-      // console.log(abtCard,'Blocks');
-    }catch(e){
-      console.error(e);
-    }
+//     try{
+//       const response = await axios.get(`${API_URL}/api/pages?filters[Title][$eq]=homepage&locale=${locale}&populate[blocks][populate]=*`);
+//       const blockss=response.data.data[0].attributes.blocks
+
+//         // Filter only shared.small-card components
+//   const smallCards = blockss.reduce((acc, block) => {
+//   if (block.__component === "shared.small-card") {
+//     acc.push(block);
+//   }
+//   return acc;
+// }, []);
+
+// setAbtCard(smallCards);
+
+//       setLoading(false);
+//       setAbout(response.data.data.attributes.blocks[2]);
+//       // setAbtCard(response.data.data[0].attributes.blocks);
+//       setAbtImage(response.data.data.attributes.blocks[2].Image.data.attributes.url);
+//       console.log(abtImage,'abtImage');
+//       // setAbtCard(abtCard.slice(-3));
+//       setAbtDesc(response.data.data.attributes.blocks[2].Description[0].children);
+//       // console.log(abtCard,'Blocks');
+//     }catch(e){
+//       console.error(e);
+//     }
+
+try {
+  const response = await axios.get(`${API_URL}/api/pages?filters[Title][$eq]=homepage&locale=${locale}&populate[blocks][populate]=*`);
+  const blocks = response.data.data?.[0]?.attributes?.blocks || [];
+
+  // Filter shared.small-card components
+  const smallCards = blocks.filter(block => block.__component === "shared.small-card");
+  setAbtCard(smallCards);
+
+  // Find about-us block safely
+  const aboutBlock = blocks.find(block => block.__component === "blocks.about-us");
+
+  if (aboutBlock) {
+    setAbout(aboutBlock);
+
+    // Safely get image and description
+    const imageUrl = aboutBlock.Image?.data?.attributes?.url || '';
+    setAbtImage(imageUrl);
+
+    const desc = aboutBlock.Description?.[0]?.children || [];
+    setAbtDesc(desc);
+  } else {
+    console.warn("No 'blocks.about-us' component found.");
+  }
+
+  setLoading(false);
+} catch (e) {
+  console.error(e);
+}
+
   }catch(err){
   }
 }
 
 useEffect(() => {
   Home();
-}, []);
+}, [locale]);
 
   return (
     <>
       {loading?(
-        <div class="loader">Loading
+        <div className="loader">Loading
   <span></span>
 </div>
       ):(

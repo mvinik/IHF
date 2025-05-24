@@ -28,6 +28,7 @@ const OnlineCourse = () => {
   const [courseCardContent, setCourseCardContent] = useState([])
   const [headerBottom, setHeaderBottom] = useState([])
   const [combo,setCombo]= useState(false);
+    const [isComboBought, setIsComboBought] = useState(false);
   const navigate = useNavigate()
 
   const option1 = {
@@ -35,6 +36,20 @@ const OnlineCourse = () => {
       Authorization: `Bearer ${JWT}`,
     },
   }
+
+const { data: purchasedCourse } = useQuery("PurchasedCourse", async () => {
+  const res = await axios.get(
+    `${API_URL}/api/users/${userId}?populate[purchased_course][populate][0]=courses.course_contents&populate[purchased_course][populate][1]=course_contents&populate[purchased_course][populate][2]=combo_packages.courses.course_contents`
+  );
+  return res.data.purchased_course;
+});
+
+useEffect(() => {
+  if (purchasedCourse?.combo_packages?.length > 0) {
+    setIsComboBought(true);
+  }
+}, [purchasedCourse]);
+
 
   const Online = async () => {
     const response = await axios.get(
@@ -48,6 +63,9 @@ const OnlineCourse = () => {
   keepPreviousData: true,
 });
 
+useEffect(() => {
+  Online();
+}, [locale]);
 
   const getCartId = async () => {
     const response = await axios.get(
@@ -115,15 +133,26 @@ const OnlineCourse = () => {
     },
   });
 
+  // const handleAddToCart = () => {
+  //   // If cart already has the combo package, navigate directly
+  //   if (combo) {
+  //     navigate('/checkout'); // ✅ Your cart page route
+  //   } else {
+  //     mutation.mutate(); // ✅ Add to cart
+  //     queryClient.invalidateQueries(['cartData']);
+  //   }
+  // };
+
   const handleAddToCart = () => {
-    // If cart already has the combo package, navigate directly
-    if (combo) {
-      navigate('/checkout'); // ✅ Your cart page route
-    } else {
-      mutation.mutate(); // ✅ Add to cart
-      queryClient.invalidateQueries(['cartData']);
-    }
-  };
+  if (isComboBought) return; // Don't do anything if already purchased
+  if (combo) {
+    navigate('/checkout'); // Already in cart
+  } else {
+    mutation.mutate(); // Add to cart
+    queryClient.invalidateQueries(['cartData']);
+  }
+};
+
 
   const FAQ = async () => {
     const response = await axios.get(`${API_URL}/api/faqs?locale=${locale}&populate=*`)
@@ -172,7 +201,7 @@ const { data: faqs } = useQuery(['faq', locale], FAQ, {
               <h3 className='p-0 m-0 text-yellow'>@ Rs.9,999.00</h3>
             </span>
           </h2>
-          <button
+          {/* <button
           className="btn my-2"
           onClick={handleAddToCart}
           disabled={mutation.isLoading}
@@ -182,7 +211,22 @@ const { data: faqs } = useQuery(['faq', locale], FAQ, {
             : mutation.isLoading
             ? t("Adding...")
             : t("View Cart")}
-        </button>
+        </button> */}
+
+     <button
+  className="btn my-2"
+  onClick={handleAddToCart}
+  disabled={isComboBought}
+>
+  {isComboBought
+    ? t("Purchased")
+    : combo
+    ? t("View Cart")
+    : mutation.isLoading
+    ? t("Adding...")
+    : t("Add to Cart")}
+</button>
+
         </div>
       </div>
 
