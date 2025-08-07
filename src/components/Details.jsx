@@ -37,7 +37,7 @@
 //   const userId = localStorage.getItem("UserId");
 
 
-  
+
 // if(localStorage.getItem('redirectToCart')){
 //   localStorage.removeItem('redirectToCart')
 //   window.location.reload();
@@ -56,7 +56,7 @@
 //   const isContentInCart = cart?.course_contents?.some(item => item.id == id);
 //   console.log(isContentInCart,'isContentInCart')
 //   useEffect(() => {
-    
+
 //   }, [isContentInCart]);
 
 //   const fetchData = async () => {
@@ -78,7 +78,7 @@
 //       console.error(err);
 //     }
 //   };
-  
+
 //   const addToCart = async () => {
 //     if (JWT) {
 //       if(cart){
@@ -126,7 +126,7 @@
 //       const isLiked = cart.courses.map(
 //         (course) => course.id.toString() === id.toString()
 //       );
-      
+
 //       const anyLiked = isLiked.includes(true);
 
 //       if (anyLiked) {
@@ -181,12 +181,12 @@
 //       console.log("NO courses purchased");
 //     }
 //   };
-  
+
 //   useEffect(() => {
 //     isPurchased();
 //   }, [purchasedCourse]);
 
- 
+
 //   const [isPreview,setIsPreview] = useState(true);
 //   const handlePlay = (videoUrl) => {
 //     window.scrollTo({
@@ -212,7 +212,7 @@
 //       setIsPlaying(true);
 //     }
 
-  
+
 //   // if (isBought) {
 //   //   setLessonVideoUrl(lessonPlan[0].courseVideo.data.attributes.url);
 //   //   setIsPlaying(true);
@@ -238,7 +238,7 @@
 //     isCartEmpty();
 //   }, [cart]);
 
- 
+
 //   if (isLoading)
 //     return (
 //       <div class="loader">
@@ -274,7 +274,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 const JWT = localStorage.getItem("JwtToken");
 
 const Details = () => {
-  const {locale}=useContext(LanguageContext)
+  const { locale } = useContext(LanguageContext)
   const { t } = useTranslation("details");
   const { id } = useParams();
   const navigate = useNavigate();
@@ -320,40 +320,50 @@ const Details = () => {
     // };
 
     const fetchData = async () => {
-  try {
-    const response = await axios.get(
-      //previous url
+      try {
+        const response = await axios.get(
+          //previous url
 
-      // `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
-    
-      //new url for different id's ,solution is localizations
+          `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo`
 
-        `${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo&populate=localizations`
-    
-    );
-    const responseData = response.data.data;
-    setCourse(responseData.attributes);
-    setLearn(responseData.attributes.content.WhatYouWillLearn || []);
-    setDesc(responseData.attributes.content.Description || []);
+          //new url for different id's ,solution is localizations
+          //`${API_URL}/api/course-contents/${id}?locale=${locale}&populate[content][populate][0]=Cover&populate[content][populate][1]=courseVideo&populate=PreviewVideo&populate=localizations`
 
-    // Safe image access
-    const cover = responseData.attributes.content?.Cover?.data?.attributes?.url;
-    if (cover) setImage(cover);
+        );
 
-    // Safe video access
-    const courseVideo = responseData.attributes.content?.courseVideo?.data?.attributes?.url;
-    if (courseVideo) setVideo(courseVideo);
+        const responseData = response.data.data;
+        setCourse(responseData.attributes);
+        setLearn(responseData.attributes.content.WhatYouWillLearn || []);
+        setDesc(responseData.attributes.content.Description || []);
+        console.log(responseData, 'responseData')
 
-    // Safe preview video access
-    const previewVideo = responseData.attributes?.PreviewVideo?.data?.attributes?.url;
-    if (previewVideo) setPreviewVideo(previewVideo);
+        // Safe image access
+        const cover = responseData.attributes.content?.Cover?.data?.attributes?.url;
+        if (cover) setImage(cover);
 
-    setUpdatedAt(responseData.attributes.updatedAt);
-    localStorage.removeItem("redirectToCart");
-  } catch (err) {
-    console.error("Failed to fetch course content:", err);
-  }
-};
+        // Safe video access
+        const courseVideo = responseData.attributes.content?.courseVideo?.data?.attributes?.url;
+        if (courseVideo) setVideo(courseVideo);
+        console.log("courseVideo", courseVideo)
+        // Safe preview video access
+        const previewVideoData = response.data.data?.attributes?.PreviewVideo?.data;
+
+        if (previewVideoData) {
+          const previewVideoUrl = previewVideoData.attributes.url;
+          setPreviewVideo(previewVideoUrl)
+          console.log("Preview Video URL:", previewVideoUrl);
+        } else {
+          console.log("No preview video available");
+        }
+
+        console.log("previewVideo", previewVideo)
+
+        setUpdatedAt(responseData.attributes.updatedAt);
+        localStorage.removeItem("redirectToCart");
+      } catch (err) {
+        console.error("Failed to fetch course content:", err);
+      }
+    };
 
 
     fetchData();
@@ -390,66 +400,66 @@ const Details = () => {
   //   );
   //   return res.data.purchased_course;
   // });
-  
+
   const { data: purchasedCourse } = useQuery("PurchasedCourse", async () => {
-  const res = await axios.get(
-    `${API_URL}/api/users/${userId}?populate[purchased_course][populate][0]=courses.course_contents&populate[purchased_course][populate][1]=course_contents&populate[purchased_course][populate][2]=combo_packages.courses.course_contents`
-  );
-  return res.data.purchased_course;
-});
+    const res = await axios.get(
+      `${API_URL}/api/users/${userId}?populate[purchased_course][populate][0]=courses.course_contents&populate[purchased_course][populate][1]=course_contents&populate[purchased_course][populate][2]=combo_packages.courses.course_contents`
+    );
+    return res.data.purchased_course;
+  });
 
 
-const isPurchased = () => {
-  if (purchasedCourse) {
-    // 1. Direct course content purchase
-    if (
-      purchasedCourse.course_contents &&
-      purchasedCourse.course_contents.some(content => content.id.toString() === id.toString())
-    ) {
-      setIsBought(true);
-      return;
+  const isPurchased = () => {
+    if (purchasedCourse) {
+      // 1. Direct course content purchase
+      if (
+        purchasedCourse.course_contents &&
+        purchasedCourse.course_contents.some(content => content.id.toString() === id.toString())
+      ) {
+        setIsBought(true);
+        return;
+      }
+
+      // 2. Course purchase
+      if (
+        purchasedCourse.courses &&
+        purchasedCourse.courses.some(course =>
+          course.course_contents?.some(content => content.id.toString() === id.toString())
+        )
+      ) {
+        setIsBought(true);
+        return;
+      }
+
+      // 3. Combo package course content access
+
+      if (
+        purchasedCourse.combo_packages &&
+        purchasedCourse.combo_packages.some(pkg =>
+          pkg.courses?.some(course =>
+            course?.course_contents?.some(content =>
+              content.id.toString() === id.toString()
+            )
+          )
+        )
+      ) {
+        setIsBought(true);
+        return;
+      }
+
+      // if (
+      //   purchasedCourse.combo_packages &&
+      //   purchasedCourse.combo_packages.some(pkg =>
+      //     pkg.courses?.some(course =>
+      //       course.course_contents?.some(content => content.id.toString() === id.toString())
+      //     )
+      //   )
+      // ) {
+      //   setIsBought(true);
+      //   return;
+      // }
     }
-
-    // 2. Course purchase
-    if (
-      purchasedCourse.courses &&
-      purchasedCourse.courses.some(course =>
-        course.course_contents?.some(content => content.id.toString() === id.toString())
-      )
-    ) {
-      setIsBought(true);
-      return;
-    }
-
-    // 3. Combo package course content access
-
-    if (
-  purchasedCourse.combo_packages &&
-  purchasedCourse.combo_packages.some(pkg =>
-    pkg.courses?.some(course =>
-      course?.course_contents?.some(content =>
-        content.id.toString() === id.toString()
-      )
-    )
-  )
-) {
-  setIsBought(true);
-  return;
-}
-
-    // if (
-    //   purchasedCourse.combo_packages &&
-    //   purchasedCourse.combo_packages.some(pkg =>
-    //     pkg.courses?.some(course =>
-    //       course.course_contents?.some(content => content.id.toString() === id.toString())
-    //     )
-    //   )
-    // ) {
-    //   setIsBought(true);
-    //   return;
-    // }
-  }
-};
+  };
 
   useEffect(() => {
     isPurchased();
@@ -460,7 +470,7 @@ const isPurchased = () => {
     if (isBought) {
       setLessonVideoUrl(video);
     } else {
-      setLessonVideoUrl(previewVideo || video);
+      setLessonVideoUrl(previewVideo);
     }
     setIsPlaying(true);
     setVideoKey(prev => prev + 1);
@@ -481,142 +491,142 @@ const isPurchased = () => {
     <>
       <NavBar />
       <div className="w-full bg-liteBlue flex justify-center  pb-20">
-  <section className="w-full max-w-[1320px] mq450:px-4  flex flex-col gap-10 text-gray1">
-    <h1 className="text-[2.3rem] mq450:text-3xl mb-0 font-semibold pl-3">{course.Name}</h1>
+        <section className="w-full max-w-[1320px] mq450:px-4  flex flex-col gap-10 text-gray1">
+          <h1 className="text-[2.3rem] mq450:text-3xl mb-0 font-semibold pl-3">{course.Name}</h1>
 
-    <div className="flex flex-col lg:flex-row gap-10 w-full">
-      {/* Video or Thumbnail */}
-      <div className="flex-1 flex flex-col gap-8">
+          <div className="flex flex-col lg:flex-row gap-10 w-full">
+            {/* Video or Thumbnail */}
+            <div className="flex-1 flex flex-col gap-8">
 
-        <div className="flex flex-row mq450:flex-col justify-between mq450:gap-5 items-center gap-20">
-        <div className="w-full flex  ">
-          {isPlaying && lessonVideoUrl ? (
-            <video
-              className="max-w-[700px] mq450:w-full  h-full object-cover rounded-xl"
-              controls
-              key={videoKey}
-              autoPlay
-            >
-              <source src={`${API_URL}${lessonVideoUrl}`} type="video/mp4" />
-             {t('Your browser does not support the video tag.')}
-            </video>
-          ) : (
-            <div className="relative">
-              <img
-                className="max-w-[700px] mq450:w-full h-full object-cover rounded-xl"
-                src={`${API_URL}${image}`}
-                alt="Course Preview"
-              />
-              <button
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3 bg-gray1 rounded-full text-white"
-                onClick={handlePreviewPlay}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-10"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-                  />
-                </svg>
-              </button>
-            </div>
-          )}
-        </div>
-           {/* Sidebar - Pricing & Info */}
-      <aside className="w-full lg:max-w-[448px] space-y-6">
-        <div className="bg-blue text-white rounded-lg shadow-lg p-6 space-y-6">
-          {isBought ? (
-            <div className="text-center">
-              <h1 className="text-2xl mb-4">{t("Keep Learning...")}</h1>
-              <button
-                className="btn1 w-full"
-                onClick={() => navigate("/onlineCourse")}
-              >
-                {t("View Courses")}
-              </button>
-            </div>
-          ) : (
-            <div className=" text-white border-b-2 border-white rounded-lg ">
-              <div className="text-2xl font-bold text-yellow">{course?.Name}</div>
-              <p className="text-6xl font-bold my-3">₹ {course?.content?.Price}</p>
-              {isContentInCart ? (
-                <Link to="/checkout">
-                  <button className="w-full btn font-bold  rounded-md py-2 px-4  text-blue">
-                   {t("View Cart")}
-                  </button>
-                </Link>
-              ) : (
-                <button
-                  onClick={addToCart}
-                  className="w-full font-bold btn  rounded-md py-2 px-4 text-blue"
-                >
-                {t("Add to Cart")}
-                </button>
-              )}
-            </div>       
-          )}
-
-          {/* Course Info */}
-          <div className="border-2 border-white text-xl">
-            <div className="flex items-start gap-2">
-              <div>{t("Video Available in Hindi")}</div>
-            </div>
-            <div className="flex items-start gap-2">
-              <div>{t("Certificate of Completion")}</div>
-            </div>
-          </div>
-        </div>
-      </aside>
-      </div>
-        {/* Course Description */}
-        <div className="flex flex-col">
-          <div>
-            <h2 className="text-[2rem] font-semibold mb-2">{t("About Course")}</h2>
-            <div className="space-y-2 text-5xl">
-              {Desc?.map((desc, index) => (
-                <div key={index}>
-                  {desc?.children?.map((child, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <Scissor1 />
-                      <p className="my-1">{child.text}</p>
+              <div className="flex flex-row mq450:flex-col justify-between mq450:gap-5 items-center gap-20">
+                <div className="w-full flex  ">
+                  {isPlaying && lessonVideoUrl ? (
+                    <video
+                      className="max-w-[700px] mq450:w-full  h-full object-cover rounded-xl"
+                      controls
+                      key={videoKey}
+                      autoPlay
+                    >
+                      <source src={`${API_URL}${lessonVideoUrl}`} type="video/mp4" />
+                      {t('Your browser does not support the video tag.')}
+                    </video>
+                  ) : (
+                    <div className="relative">
+                      <img
+                        className="max-w-[700px] mq450:w-full h-full object-cover rounded-xl"
+                        src={`${API_URL}${image}`}
+                        alt="Course Preview"
+                      />
+                      <button
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-3 bg-gray1 rounded-full text-white"
+                        onClick={handlePreviewPlay}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-10"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
+                          />
+                        </svg>
+                      </button>
                     </div>
-                  ))}
+                  )}
                 </div>
-              ))}
-            </div>
-          </div>
+                {/* Sidebar - Pricing & Info */}
+                <aside className="w-full lg:max-w-[448px] space-y-6">
+                  <div className="bg-blue text-white rounded-lg shadow-lg p-6 space-y-6">
+                    {isBought ? (
+                      <div className="text-center">
+                        <h1 className="text-2xl mb-4">{t("Keep Learning...")}</h1>
+                        <button
+                          className="btn1 w-full"
+                          onClick={() => navigate("/onlineCourse")}
+                        >
+                          {t("View Courses")}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className=" text-white border-b-2 border-white rounded-lg ">
+                        <div className="text-2xl font-bold text-yellow">{course?.Name}</div>
+                        <p className="text-6xl font-bold my-3">₹ {course?.content?.Price}</p>
+                        {isContentInCart ? (
+                          <Link to="/checkout">
+                            <button className="w-full btn font-bold  rounded-md py-2 px-4  text-blue">
+                              {t("View Cart")}
+                            </button>
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={addToCart}
+                            className="w-full font-bold btn  rounded-md py-2 px-4 text-blue"
+                          >
+                            {t("Add to Cart")}
+                          </button>
+                        )}
+                      </div>
+                    )}
 
-          <div className="">
-            <h2 className="text-[2rem] font-semibold mb-2">{t("What Will You Learn?")}</h2>
-            <div className="space-y-2 text-5xl">
-              {learn?.map((L, index) => (
-                <div key={index}>
-                  {L?.children?.map((child, i) => (
-                    <div key={i} className="flex  gap-2">
-                      <Scissor1 />
-                      <p className="my-1">{child?.text}</p>
+                    {/* Course Info */}
+                    <div className="border-2 border-white text-xl">
+                      <div className="flex items-start gap-2">
+                        <div>{t("Video Available in Hindi")}</div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div>{t("Certificate of Completion")}</div>
+                      </div>
                     </div>
-                  ))}
+                  </div>
+                </aside>
+              </div>
+              {/* Course Description */}
+              <div className="flex flex-col">
+                <div>
+                  <h2 className="text-[2rem] font-semibold mb-2">{t("About Course")}</h2>
+                  <div className="space-y-2 text-5xl">
+                    {Desc?.map((desc, index) => (
+                      <div key={index}>
+                        {desc?.children?.map((child, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <Scissor1 />
+                            <p className="my-1">{child.text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+
+                <div className="">
+                  <h2 className="text-[2rem] font-semibold mb-2">{t("What Will You Learn?")}</h2>
+                  <div className="space-y-2 text-5xl">
+                    {learn?.map((L, index) => (
+                      <div key={index}>
+                        {L?.children?.map((child, i) => (
+                          <div key={i} className="flex  gap-2">
+                            <Scissor1 />
+                            <p className="my-1">{child?.text}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
+
+
           </div>
-        </div>
+        </section>
       </div>
 
-   
-    </div>
-  </section>
-</div>
-
-<Footer />
+      <Footer />
 
     </>
   );

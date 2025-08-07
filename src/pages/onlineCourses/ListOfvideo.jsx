@@ -24,6 +24,7 @@ const ListOfvideo = () => {
   const queryClient = useQueryClient();
   const { id } = useParams();
   const [CourseData, setCourseData] = useState(null);
+  const [coursePreview, setCoursePreview] = useState(null)
   const navigate = useNavigate();
   const fetchData = async () => {
     try {
@@ -43,6 +44,7 @@ const ListOfvideo = () => {
 
   // console.log(CourseData);
 
+  //Here the purchased course is for the button for reference the course is purchased or not
 
   const { data: purchasedCourse } = useQuery("PurchasedCourse", async () => {
     const res = await axios.get(
@@ -53,60 +55,32 @@ const ListOfvideo = () => {
 
 
   const isPurchased = () => {
-    if (purchasedCourse) {
-      // 1. Direct course content purchase
-      if (
-        purchasedCourse.course_contents &&
-        purchasedCourse.course_contents.some(content => content.id.toString() === id.toString())
-      ) {
-        setIsBought(true);
-        return;
-      }
+    if (!purchasedCourse || !id) return;
 
-      // 2. Course purchase
-      if (
-        purchasedCourse.courses &&
-        purchasedCourse.courses.some(course =>
-          course.course_contents?.some(content => content.id.toString() === id.toString())
-        )
-      ) {
-        setIsBought(true);
-        return;
-      }
+    // // Check 1: Direct course_contents purchase
+    // const isContentBought =
+    //   purchasedCourse.course_contents?.some(content => content.id.toString() === id.toString());
 
-      // 3. Combo package course content access
+    // Check 2: Course purchase (check actual course ID)
+    const isCourseBought =
+      purchasedCourse.courses?.some(course => course.id.toString() === id.toString());
 
-      if (
-        purchasedCourse.combo_packages &&
-        purchasedCourse.combo_packages.some(pkg =>
-          pkg.courses?.some(course =>
-            course?.course_contents?.some(content =>
-              content.id.toString() === id.toString()
-            )
-          )
-        )
-      ) {
-        setIsBought(true);
-        return;
-      }
+    // Check 3: Combo packages (check all nested courses)
+    const isComboBought =
+      purchasedCourse.combo_packages?.some(pkg =>
+        pkg.courses?.some(course => course.id.toString() === id.toString())
+      );
 
-      // if (
-      //   purchasedCourse.combo_packages &&
-      //   purchasedCourse.combo_packages.some(pkg =>
-      //     pkg.courses?.some(course =>
-      //       course.course_contents?.some(content => content.id.toString() === id.toString())
-      //     )
-      //   )
-      // ) {
-      //   setIsBought(true);
-      //   return;
-      // }
+    if (isCourseBought || isComboBought) {
+      setIsBought(true);
     }
   };
 
+
   useEffect(() => {
     isPurchased();
-  }, [purchasedCourse]);
+  }, [purchasedCourse, id]);
+
 
   const option1 = {
     headers: {
@@ -181,6 +155,19 @@ const ListOfvideo = () => {
 
   const isCourseInCart = carts?.attributes?.courses?.data?.some(item => item.id == id);
   // console.log(isCourseInCart,'isCourseInCart')
+
+  const fetchPreviewCourse = async () => {
+    const response = await axios.get(`${API_URL}/api/courses/${id}?populate=*`)
+    const coursePrevieww = response.data.data?.attributes?.PreviewVideo?.data?.attributes?.url;
+    setCoursePreview(coursePrevieww)
+    console.log('coursepreview', coursePrevieww)
+  }
+  const videoSrc = coursePreview ? new URL(coursePreview, API_URL).href : null;
+
+
+  useEffect(() => {
+    fetchPreviewCourse()
+  }, [id])
 
   useEffect(() => {
   }, [isCourseInCart, carts]);
@@ -264,10 +251,15 @@ const ListOfvideo = () => {
           <div className='w-1/4 mq925:w-fit mq925:mb-10 bg-blue h-fit '>
             <div className='h-auto w-fit flex flex-col justify-center items-start px-4 py-4'>
               <h2 className='uppercase text-white my-0'>{t("Preview Video")}</h2>
-              <video className='h-full w-full' controls >
-                <source src="https://api.ihfbyjavedkhan.com/uploads/pexels_roman_odintsov_12724042_2160p_4b0e09c81d.mp4" type="video/mp4" />
-                {t("Your browser does not support the video tag.")}
-              </video>
+             {videoSrc ? (
+  <video className='h-full w-full' controls>
+    <source src={videoSrc} type="video/mp4" />
+    {t("Your browser does not support the video tag.")}
+  </video>
+) : (
+  <h3 className='text-white mt-2'>{t("Preview video not available.")}</h3>
+)}
+
             </div>
             <hr className='h-1 bg-white mx-3 my-0' />
             <div className=' p-3 h-max  text-white'>
@@ -293,11 +285,12 @@ const ListOfvideo = () => {
                 disabled={isBought}
               >
                 {isBought
-                  ? 'Purchased'
+                  ? t( 'Purchased')
                   : isCourseInCart
                     ? t('View Cart')
                     : t('Add to Cart')}
               </button>
+
 
 
               <hr className='h-1 bg-white my-3' />
